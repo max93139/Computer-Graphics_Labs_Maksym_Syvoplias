@@ -31,6 +31,64 @@ def print_header(title: str):
     print(f"\n[{title}]")
 
 
+def get_int_input(prompt: str, default: int, min_val: int = None, max_val: int = None) -> int:
+    """Безпечне зчитування цілого числа з валідацією меж."""
+    while True:
+        val_str = input(prompt).strip()
+        if not val_str:
+            return default
+        try:
+            val = int(val_str)
+            if min_val is not None and val < min_val:
+                print(f"[Помилка] Значення має бути не менше {min_val}.")
+                continue
+            if max_val is not None and val > max_val:
+                print(f"[Помилка] Значення має бути не більше {max_val}.")
+                continue
+            return val
+        except ValueError:
+            print("[Помилка] Введіть коректне ціле число.")
+
+
+def get_float_input(prompt: str, default: float, min_val: float = None, max_val: float = None) -> float:
+    """Безпечне зчитування дійсного числа з підтримкою крапки та коми."""
+    while True:
+        val_str = input(prompt).strip().replace(',', '.')
+        if not val_str:
+            return default
+        try:
+            val = float(val_str)
+            if min_val is not None and val < min_val:
+                print(f"[Помилка] Значення має бути не менше {min_val}.")
+                continue
+            if max_val is not None and val > max_val:
+                print(f"[Помилка] Значення має бути не більше {max_val}.")
+                continue
+            return val
+        except ValueError:
+            print("[Помилка] Введіть коректне число.")
+
+
+def get_rgb_input(prompt: str, default: tuple[int, int, int]) -> tuple[int, int, int]:
+    """Безпечне зчитування колірного кортежу (R, G, B) у діапазоні 0..255."""
+    while True:
+        val_str = input(prompt).strip()
+        if not val_str:
+            return default
+        parts = val_str.replace(',', ' ').split()
+        if len(parts) != 3:
+            print("[Помилка] Введіть три числа через пробіл (R G B від 0 до 255).")
+            continue
+        try:
+            r, g, b = (int(p) for p in parts)
+            if not (0 <= r <= 255 and 0 <= g <= 255 and 0 <= b <= 255):
+                print("[Помилка] Значення каналів R, G, B повинні бути в межах [0..255].")
+                continue
+            return (r, g, b)
+        except ValueError:
+            print("[Помилка] Введіть три цілих числа для R G B.")
+
+
 def handle_format_conversion():
     print_header("ЗАВДАННЯ 1: КОНВЕРТАЦІЯ ФОРМАТІВ ЗОБРАЖЕНЬ")
     print("1. Конвертувати одне зображення")
@@ -121,14 +179,14 @@ def handle_resize():
     width, height, scale, keep_ratio = None, None, None, True
 
     if resize_type == "A":
-        scale = float(input("Введіть відсоток масштабування [50]: ").strip() or "50")
+        scale = get_float_input("Введіть відсоток масштабування [50]: ", 50.0, min_val=0.1)
     elif resize_type == "B":
-        width = int(input("Введіть нову ширину (px) [200]: ").strip() or "200")
+        width = get_int_input("Введіть нову ширину (px) [200]: ", 200, min_val=1)
     elif resize_type == "C":
-        height = int(input("Введіть нову висоту (px) [150]: ").strip() or "150")
+        height = get_int_input("Введіть нову висоту (px) [150]: ", 150, min_val=1)
     elif resize_type == "D":
-        width = int(input("Введіть ширину (px) [300]: ").strip() or "300")
-        height = int(input("Введіть висоту (px) [200]: ").strip() or "200")
+        width = get_int_input("Введіть ширину (px) [300]: ", 300, min_val=1)
+        height = get_int_input("Введіть висоту (px) [200]: ", 200, min_val=1)
         keep_ratio = False
 
     if mode == "1":
@@ -176,15 +234,13 @@ def handle_color_replacement():
 
     print("\nВведіть значення кольору, який треба замінити (R, G, B від 0 до 255): ")
     print("Підказка для зразка: Червоний = 255 0 0, Зелений = 0 255 0, Синій = 0 0 255, Жовтий = 255 255 0")
-    t_str = input("Цільовий колір R G B [255 0 0]: ").strip() or "255 0 0"
-    target_color = tuple(map(int, t_str.split()))
+    target_color = get_rgb_input("Цільовий колір R G B [255 0 0]: ", (255, 0, 0))
 
     print("\nВведіть значення нового кольору (R, G, B від 0 до 255): ")
     print("Підказка: Фіолетовий = 128 0 128, Бірюзовий = 0 255 255, Чорний = 0 0 0, Білий = 255 255 255")
-    n_str = input("Новий колір R G B [128 0 128]: ").strip() or "128 0 128"
-    new_color = tuple(map(int, n_str.split()))
+    new_color = get_rgb_input("Новий колір R G B [128 0 128]: ", (128, 0, 128))
 
-    tolerance_val = int(input("Похибка порівняння tolerance (0 - точний збіг) [15]: ").strip() or "15")
+    tolerance_val = get_int_input("Похибка порівняння tolerance (0 - точний збіг) [15]: ", 15, min_val=0, max_val=442)
     out_file = input("Введіть вихідний шлях [output/color_replaced.png]: ").strip() or "output/color_replaced.png"
 
     print("\n[Обробка власним попіксельним перебором...]")
@@ -208,9 +264,9 @@ def handle_color_balance():
 
     if mode == "1":
         print("\nВведіть коефіцієнти множення каналів (1.0 = без змін, >1.0 збільшити, <1.0 зменшити):")
-        rf = float(input("Червоний коефіцієнт (R factor) [1.3]: ").strip() or "1.3")
-        gf = float(input("Зелений коефіцієнт (G factor) [1.0]: ").strip() or "1.0")
-        bf = float(input("Синій коефіцієнт (B factor) [0.8]: ").strip() or "0.8")
+        rf = get_float_input("Червоний коефіцієнт (R factor) [1.3]: ", 1.3, min_val=0.0)
+        gf = get_float_input("Зелений коефіцієнт (G factor) [1.0]: ", 1.0, min_val=0.0)
+        bf = get_float_input("Синій коефіцієнт (B factor) [0.8]: ", 0.8, min_val=0.0)
 
         out_file = input("Введіть вихідний шлях [output/balance_manual.jpg]: ").strip() or "output/balance_manual.jpg"
         print("\n[Обробка попіксельним розрахунком...]")
@@ -241,24 +297,28 @@ def main():
 
         choice = input("Введіть номер дії (0-4): ").strip()
 
-        if choice == "1":
-            handle_format_conversion()
+        try:
+            if choice == "1":
+                handle_format_conversion()
+                input("\nНатисніть Enter для повернення в меню...")
+            elif choice == "2":
+                handle_resize()
+                input("\nНатисніть Enter для повернення в меню...")
+            elif choice == "3":
+                handle_color_replacement()
+                input("\nНатисніть Enter для повернення в меню...")
+            elif choice == "4":
+                handle_color_balance()
+                input("\nНатисніть Enter для повернення в меню...")
+            elif choice == "0":
+                print("\nРоботу програми завершено. До побачення!")
+                break
+            else:
+                print("\n[!] Невірний вибір. Спробуйте ще раз.")
+                input("\nНатисніть Enter для продовження...")
+        except Exception as err:
+            print(f"\n[Помилка під час виконання операції]: {err}")
             input("\nНатисніть Enter для повернення в меню...")
-        elif choice == "2":
-            handle_resize()
-            input("\nНатисніть Enter для повернення в меню...")
-        elif choice == "3":
-            handle_color_replacement()
-            input("\nНатисніть Enter для повернення в меню...")
-        elif choice == "4":
-            handle_color_balance()
-            input("\nНатисніть Enter для повернення в меню...")
-        elif choice == "0":
-            print("\nРоботу програми завершено. До побачення!")
-            break
-        else:
-            print("\n[!] Невірний вибір. Спробуйте ще раз.")
-            input("\nНатисніть Enter для продовження...")
 
 
 if __name__ == '__main__':
@@ -266,3 +326,4 @@ if __name__ == '__main__':
         main()
     except (KeyboardInterrupt, EOFError):
         print("\n\nРоботу програми перервано. До побачення!")
+
