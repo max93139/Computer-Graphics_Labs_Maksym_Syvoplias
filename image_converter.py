@@ -28,10 +28,28 @@ def load_image_pixels(filepath: str) -> tuple[list[tuple[int, int, int]], int, i
         return pixels, width, height
 
 
+def resolve_output_path(output_path: str, default_filename: str) -> str:
+    """
+    Якщо output_path не вказано, є директорією або закінчується на слеш,
+    повертає шлях до файлу всередині цієї директорії з ім'ям default_filename.
+    """
+    if not output_path:
+        return os.path.join('output', default_filename)
+    if os.path.isdir(output_path) or output_path.endswith('/') or output_path.endswith('\\'):
+        return os.path.join(output_path, default_filename)
+    return output_path
+
+
 def save_pixels_to_image(filepath: str, width: int, height: int, pixels: list[tuple[int, int, int]], format_name: str = None):
     """
     Зберігає масив пікселів у файл заданого формату.
     """
+    if os.path.isdir(filepath) or filepath.endswith('/') or filepath.endswith('\\'):
+        ext = (format_name or 'png').lower()
+        if ext == 'jpeg':
+            ext = 'jpg'
+        filepath = os.path.join(filepath, f"output.{ext}")
+
     out_img = Image.new('RGB', (width, height))
     out_img.putdata(pixels)
     os.makedirs(os.path.dirname(filepath) or '.', exist_ok=True)
@@ -51,13 +69,13 @@ def convert_format(input_path: str, output_format: str, output_path: str = None)
 
     pixels, w, h = load_image_pixels(input_path)
 
-    if not output_path:
-        file_name = os.path.splitext(os.path.basename(input_path))[0]
-        ext = target_format.lower()
-        if ext == 'jpeg':
-            ext = 'jpg'
-        output_path = os.path.join('output', f"{file_name}_converted.{ext}")
+    file_name = os.path.splitext(os.path.basename(input_path))[0]
+    ext = target_format.lower()
+    if ext == 'jpeg':
+        ext = 'jpg'
+    default_filename = f"{file_name}_converted.{ext}"
 
+    output_path = resolve_output_path(output_path, default_filename)
     save_pixels_to_image(output_path, w, h, pixels, format_name=target_format)
 
     initial_bytes = os.path.getsize(input_path)
@@ -97,7 +115,7 @@ def batch_convert_formats(input_paths: list[str], output_format: str, output_dir
 
 def resize_image(
     input_path: str,
-    output_path: str,
+    output_path: str = None,
     width: int = None,
     height: int = None,
     scale_percent: float = None,
@@ -137,6 +155,9 @@ def resize_image(
     else:
         resized_pixels = ma.resize_bilinear(pixels, orig_w, orig_h, new_w, new_h)
 
+    file_name = os.path.basename(input_path)
+    default_filename = f"resized_{file_name}"
+    output_path = resolve_output_path(output_path, default_filename)
     save_pixels_to_image(output_path, new_w, new_h, resized_pixels)
 
     return {
@@ -183,14 +204,15 @@ def batch_resize_images(
 
 def replace_color(
     input_path: str,
-    output_path: str,
-    target_color: tuple[int, int, int],
-    new_color: tuple[int, int, int],
+    output_path: str = None,
+    target_color: tuple[int, int, int] = (255, 0, 0),
+    new_color: tuple[int, int, int] = (128, 0, 128),
     tolerance: int = 15
 ) -> dict:
     """Замінює всі пікселі цільового кольору за допомогою власної функції."""
     pixels, w, h = load_image_pixels(input_path)
     new_pixels, replaced_count = ma.replace_pixels_color(pixels, target_color, new_color, tolerance)
+    output_path = resolve_output_path(output_path, "color_replaced.png")
     save_pixels_to_image(output_path, w, h, new_pixels)
 
     total_pixels = len(pixels)
@@ -212,7 +234,7 @@ def replace_color(
 
 def adjust_color_balance(
     input_path: str,
-    output_path: str,
+    output_path: str = None,
     r_factor: float = 1.0,
     g_factor: float = 1.0,
     b_factor: float = 1.0,
@@ -231,6 +253,7 @@ def adjust_color_balance(
         g_delta=g_delta,
         b_delta=b_delta
     )
+    output_path = resolve_output_path(output_path, "balance_manual.jpg")
     save_pixels_to_image(output_path, w, h, new_pixels)
 
     return {
@@ -245,10 +268,11 @@ def adjust_color_balance(
     }
 
 
-def auto_color_balance(input_path: str, output_path: str, target_mean: float = 128.0) -> dict:
+def auto_color_balance(input_path: str, output_path: str = None, target_mean: float = 128.0) -> dict:
     """Автоматична корекція балансу за формулою з методички."""
     pixels, w, h = load_image_pixels(input_path)
     new_pixels, stats = ma.apply_auto_color_balance(pixels, target_mean=target_mean)
+    output_path = resolve_output_path(output_path, "balance_auto.jpg")
     save_pixels_to_image(output_path, w, h, new_pixels)
 
     return {
