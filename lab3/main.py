@@ -28,7 +28,7 @@ def show_menu():
 
 
 def handle_merge():
-    print("\n--- Завдання 1: Об'єднання зображень ---")
+    print("\nЗавдання 1: Об'єднання зображень")
     p1 = input("Шлях до першого зображення [samples/sample_gradient.jpg]: ").strip() or "samples/sample_gradient.jpg"
     p2 = input("Шлях до другого зображення [samples/sample_palette.png]: ").strip() or "samples/sample_palette.png"
 
@@ -53,7 +53,7 @@ def handle_merge():
 
 
 def handle_watermark():
-    print("\n--- Завдання 2: Створення водяного знаку ---")
+    print("\nЗавдання 2: Створення водяного знаку")
     base_file = input("Шлях до зображення [samples/sample_gradient.jpg]: ").strip() or "samples/sample_gradient.jpg"
     if not os.path.exists(base_file):
         print(f"[Помилка] Файл '{base_file}' не знайдено.")
@@ -122,7 +122,7 @@ def handle_watermark():
 
 
 def handle_slideshow():
-    print("\n--- Завдання 3: Створення та запуск слайд-шоу ---")
+    print("\nЗавдання 3: Створення та запуск слайд-шоу")
     print("1. Відтворити зображення з папки output/")
     print("2. Відтворити зображення з папки samples/")
     print("3. Вказати власну папку")
