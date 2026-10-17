@@ -28,10 +28,6 @@ def save_image(filepath, width, height, pixels):
     img.save(filepath)
 
 
-# =====================================================================
-# 1. ОБ'ЄДНАННЯ ЗОБРАЖЕНЬ
-# =====================================================================
-
 def combine_two_images(path1, path2, direction='horizontal', bg_color=(255, 255, 255), output_path='output/merged.png'):
     """
     Об'єднує два зображення горизонтально або вертикально.
@@ -47,10 +43,6 @@ def combine_two_images(path1, path2, direction='horizontal', bg_color=(255, 255,
     save_image(output_path, out_w, out_h, res_pixels)
     return output_path, out_w, out_h
 
-
-# =====================================================================
-# 2. ВОДЯНИЙ ЗНАК
-# =====================================================================
 
 def add_text_watermark(
     base_path,
@@ -129,10 +121,6 @@ def add_text_watermark(
     save_image(output_path, w, h, blended_pixels)
     return output_path, (pos_x, pos_y)
 
-
-# =====================================================================
-# 3. СЛАЙД-ШОУ
-# =====================================================================
 
 def play_slideshow(image_paths, delay=2.0):
     """
