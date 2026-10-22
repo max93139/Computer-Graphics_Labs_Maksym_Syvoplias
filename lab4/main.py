@@ -75,28 +75,77 @@ def handle_color_histogram():
     print(f"[Успіх] Гістограму успішно збережено в: {saved}")
 
 
+def show_color_transformations_menu():
+    print("\nЗавдання 4: Зміна кольоровості")
+    print("1. Бінаризація (перехід до чорно-білого)")
+    print("2. Перехід до відтінків сірого")
+    print("3. Негатив")
+    print("4. Побудова гістограми зображення в градаціях сірого")
+    print("5. Виконати всі 4 операції разом")
+    print("0. Назад у головне меню")
+
+
 def handle_color_transformations():
-    print("\nЗавдання 4: Зміна кольоровості зображення")
-    path = input("Шлях до файлу [samples/sample_gradient.jpg]: ").strip() or "samples/sample_gradient.jpg"
+    default_img = "samples/sample_gradient.jpg"
 
-    if not os.path.exists(path):
-        print(f"[Помилка] Файл '{path}' не знайдено.")
-        return
+    while True:
+        show_color_transformations_menu()
+        sub_choice = input("Оберіть підпункт (0-5): ").strip()
 
-    p_str = input("Поріг бінаризації P від 0 до 255 [128]: ").strip() or "128"
-    try:
-        threshold = int(p_str)
-    except ValueError:
-        threshold = 128
+        if sub_choice == "0":
+            break
 
-    print("\n[Виконання перетворень кольоровості...]")
-    res = ops.apply_color_transformations(path, output_dir="output", threshold=threshold)
+        path = input(f"Шлях до файлу [{default_img}]: ").strip() or default_img
+        if not os.path.exists(path):
+            print(f"[Помилка] Файл '{path}' не знайдено.")
+            continue
 
-    print("[Успіх] Всі операції зміни кольоровості успішно виконано:")
-    print(f"  • Перехід до відтінків сірого:      {res['gray_path']}")
-    print(f"  • Бінаризація (поріг {res['threshold']}):            {res['bin_path']}")
-    print(f"  • Фотографічний негатив:           {res['neg_path']}")
-    print(f"  • Гістограма для сірого зображення: {res['hist_path']}")
+        if sub_choice == "1":
+            p_str = input("Поріг бінаризації P від 0 до 255 [128]: ").strip() or "128"
+            try:
+                threshold = int(p_str)
+            except ValueError:
+                threshold = 128
+            out_file = f"output/binarized_p{threshold}.png"
+            res = ops.run_binarize(path, threshold=threshold, output_path=out_file)
+            print(f"[Успіх] Бінаризоване зображення збережено в: {res}")
+            input("\nНатисніть Enter для продовження...")
+
+        elif sub_choice == "2":
+            out_file = "output/grayscale.png"
+            res = ops.run_grayscale(path, output_path=out_file)
+            print(f"[Успіх] Зображення у відтінках сірого збережено в: {res}")
+            input("\nНатисніть Enter для продовження...")
+
+        elif sub_choice == "3":
+            out_file = "output/negative.png"
+            res = ops.run_negative(path, output_path=out_file)
+            print(f"[Успіх] Негатив зображення збережено в: {res}")
+            input("\nНатисніть Enter для продовження...")
+
+        elif sub_choice == "4":
+            out_hist = "output/histogram_gray.png"
+            res = ops.plot_grayscale_histogram(path, output_plot_path=out_hist, show=True)
+            print(f"[Успіх] Гістограму зображення збережено в: {res}")
+            input("\nНатисніть Enter для продовження...")
+
+        elif sub_choice == "5":
+            p_str = input("Поріг бінаризації P від 0 до 255 [128]: ").strip() or "128"
+            try:
+                threshold = int(p_str)
+            except ValueError:
+                threshold = 128
+            print("\n[Виконання комплексу перетворень кольоровості...]")
+            res = ops.apply_color_transformations(path, output_dir="output", threshold=threshold)
+            print("[Успіх] Всі операції зміни кольоровості успішно виконано:")
+            print(f"  • Перехід до відтінків сірого:      {res['gray_path']}")
+            print(f"  • Бінаризація (поріг {res['threshold']}):            {res['bin_path']}")
+            print(f"  • Фотографічний негатив:           {res['neg_path']}")
+            print(f"  • Гістограма для сірого зображення: {res['hist_path']}")
+            input("\nНатисніть Enter для продовження...")
+
+        else:
+            print("[!] Невірний вибір. Спробуйте ще раз.")
 
 
 def main():
@@ -118,10 +167,10 @@ def main():
             input("\nНатисніть Enter для повернення в меню...")
         elif choice == "4":
             handle_color_transformations()
-            input("\nНатисніть Enter для повернення в меню...")
         else:
             print("[!] Невірний вибір. Спробуйте ще раз.")
 
 
 if __name__ == '__main__':
     main()
+

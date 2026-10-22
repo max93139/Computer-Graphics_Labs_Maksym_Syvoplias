@@ -160,6 +160,41 @@ def plot_grayscale_histogram(input_path, output_plot_path="output/histogram_gray
     return output_plot_path
 
 
+def run_grayscale(input_path, output_path="output/grayscale.png"):
+    """
+    Виконує перетворення у відтінки сірого та зберігає зображення.
+    """
+    pixels, w, h, _ = load_image(input_path)
+    os.makedirs(os.path.dirname(output_path) or '.', exist_ok=True)
+    gray_pixels = algos.to_grayscale(pixels)
+    save_image(output_path, w, h, gray_pixels)
+    return output_path
+
+
+def run_binarize(input_path, threshold=128, output_path=None):
+    """
+    Виконує порогову бінаризацію зображення за порогом P.
+    """
+    pixels, w, h, _ = load_image(input_path)
+    if output_path is None:
+        output_path = f"output/binarized_p{threshold}.png"
+    os.makedirs(os.path.dirname(output_path) or '.', exist_ok=True)
+    bin_pixels = algos.binarize(pixels, threshold=threshold)
+    save_image(output_path, w, h, bin_pixels)
+    return output_path
+
+
+def run_negative(input_path, output_path="output/negative.png"):
+    """
+    Створює негатив зображення та зберігає файл.
+    """
+    pixels, w, h, _ = load_image(input_path)
+    os.makedirs(os.path.dirname(output_path) or '.', exist_ok=True)
+    neg_pixels = algos.to_negative(pixels)
+    save_image(output_path, w, h, neg_pixels)
+    return output_path
+
+
 def apply_color_transformations(input_path, output_dir="output", threshold=128):
     """
     Виконує всі 4 підзавдання зі зміни кольоровості:
@@ -171,17 +206,14 @@ def apply_color_transformations(input_path, output_dir="output", threshold=128):
     pixels, w, h, _ = load_image(input_path)
     os.makedirs(output_dir, exist_ok=True)
 
-    gray_pixels = algos.to_grayscale(pixels)
     gray_file = os.path.join(output_dir, "grayscale.png")
-    save_image(gray_file, w, h, gray_pixels)
+    run_grayscale(input_path, gray_file)
 
-    bin_pixels = algos.binarize(pixels, threshold=threshold)
     bin_file = os.path.join(output_dir, f"binarized_p{threshold}.png")
-    save_image(bin_file, w, h, bin_pixels)
+    run_binarize(input_path, threshold=threshold, output_path=bin_file)
 
-    neg_pixels = algos.to_negative(pixels)
     neg_file = os.path.join(output_dir, "negative.png")
-    save_image(neg_file, w, h, neg_pixels)
+    run_negative(input_path, neg_file)
 
     hist_gray_file = os.path.join(output_dir, "histogram_gray.png")
     plot_grayscale_histogram(gray_file, hist_gray_file, show=False)
@@ -194,3 +226,4 @@ def apply_color_transformations(input_path, output_dir="output", threshold=128):
         "threshold": threshold,
         "dimensions": (w, h)
     }
+
