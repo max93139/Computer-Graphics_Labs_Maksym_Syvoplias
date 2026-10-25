@@ -23,7 +23,7 @@ def show_menu():
 
 def handle_display():
     print("\nДія 1: Виведення первинного кольорового зображення")
-    path = input("Шлях до файлу [samples/sample_gradient.jpg]: ").strip() or "samples/sample_gradient.jpg"
+    path = input("Шлях до файлу [samples/sample_building.jpg]: ").strip() or "samples/sample_building.jpg"
 
     if not os.path.exists(path):
         print(f"[Помилка] Файл '{path}' не знайдено.")
@@ -36,7 +36,7 @@ def handle_display():
 
 def handle_east_prewitt():
     print("\nДія 2: Фільтрація курсовою маскою 'Схід' (Prewitt East)")
-    path = input("Шлях до файлу [samples/sample_gradient.jpg]: ").strip() or "samples/sample_gradient.jpg"
+    path = input("Шлях до файлу [samples/sample_building.jpg]: ").strip() or "samples/sample_building.jpg"
 
     if not os.path.exists(path):
         print(f"[Помилка] Файл '{path}' не знайдено.")
@@ -51,7 +51,7 @@ def handle_east_prewitt():
 
 def handle_east_sobel():
     print("\nДія 3: Фільтрація курсовою маскою 'Схід' (Sobel East)")
-    path = input("Шлях до файлу [samples/sample_gradient.jpg]: ").strip() or "samples/sample_gradient.jpg"
+    path = input("Шлях до файлу [samples/sample_building.jpg]: ").strip() or "samples/sample_building.jpg"
 
     if not os.path.exists(path):
         print(f"[Помилка] Файл '{path}' не знайдено.")
@@ -66,7 +66,7 @@ def handle_east_sobel():
 
 def handle_east_offset():
     print("\nДія 4: Фільтрація курсовою маскою 'Схід' з підвищенням порогу яскравості (+100)")
-    path = input("Шлях до файлу [samples/sample_gradient.jpg]: ").strip() or "samples/sample_gradient.jpg"
+    path = input("Шлях до файлу [samples/sample_building.jpg]: ").strip() or "samples/sample_building.jpg"
 
     if not os.path.exists(path):
         print(f"[Помилка] Файл '{path}' не знайдено.")
@@ -87,7 +87,7 @@ def handle_east_offset():
 
 def handle_east_threshold():
     print("\nДія 5: Фільтрація курсовою маскою 'Схід' з бінаризацією меж")
-    path = input("Шлях до файлу [samples/sample_gradient.jpg]: ").strip() or "samples/sample_gradient.jpg"
+    path = input("Шлях до файлу [samples/sample_building.jpg]: ").strip() or "samples/sample_building.jpg"
 
     if not os.path.exists(path):
         print(f"[Помилка] Файл '{path}' не знайдено.")
@@ -108,7 +108,7 @@ def handle_east_threshold():
 
 def handle_comparison():
     print("\nДія 6: Комплексне порівняння та формування колажу")
-    path = input("Шлях до файлу [samples/sample_gradient.jpg]: ").strip() or "samples/sample_gradient.jpg"
+    path = input("Шлях до файлу [samples/sample_building.jpg]: ").strip() or "samples/sample_building.jpg"
 
     if not os.path.exists(path):
         print(f"[Помилка] Файл '{path}' не знайдено.")
