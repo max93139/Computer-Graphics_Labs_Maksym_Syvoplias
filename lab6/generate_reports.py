@@ -459,7 +459,11 @@ def build_md_report(output_md_path, img_paths):
 
 
 def main():
-    base_dir = "/Users/mac/Desktop/Python/Computer Graphics/lab1/lab6"
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    root_dir = os.path.abspath(os.path.join(base_dir, "..", ".."))
+    context_dir = os.path.join(root_dir, "context ")
+    root_lab6_dir = os.path.join(root_dir, "lab6")
+
     img_paths = {
         "lab6_image1": os.path.join(base_dir, "screenshots/lab6_image1.png"),
         "lab6_image2": os.path.join(base_dir, "screenshots/lab6_image2.png"),
@@ -477,16 +481,15 @@ def main():
     build_docx_report(docx_lab6, img_paths)
     build_md_report(md_lab6, img_paths)
 
-    context_dir = "/Users/mac/Desktop/Python/Computer Graphics/context "
-    docx_context = os.path.join(context_dir, "Лабораторна робота 6 Графіка.docx")
-    md_context = os.path.join(context_dir, "Лабораторна робота 6 Графіка.docx.md")
+    if os.path.exists(context_dir):
+        docx_context = os.path.join(context_dir, "Лабораторна робота 6 Графіка.docx")
+        md_context = os.path.join(context_dir, "Лабораторна робота 6 Графіка.docx.md")
+        build_docx_report(docx_context, img_paths)
+        build_md_report(md_context, img_paths)
 
-    build_docx_report(docx_context, img_paths)
-    build_md_report(md_context, img_paths)
-
-    root_lab6_dir = "/Users/mac/Desktop/Python/Computer Graphics/lab6"
-    build_docx_report(os.path.join(root_lab6_dir, "Лабораторна робота 6 Графіка.docx"), img_paths)
-    build_md_report(os.path.join(root_lab6_dir, "Лабораторна робота 6 Графіка.md"), img_paths)
+    if os.path.exists(root_lab6_dir):
+        build_docx_report(os.path.join(root_lab6_dir, "Лабораторна робота 6 Графіка.docx"), img_paths)
+        build_md_report(os.path.join(root_lab6_dir, "Лабораторна робота 6 Графіка.md"), img_paths)
 
     print("Усі звіти DOCX та MD успішно сформовано та синхронізовано!")
 

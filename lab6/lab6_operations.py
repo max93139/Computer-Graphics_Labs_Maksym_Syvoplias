@@ -5,11 +5,47 @@
 """
 
 import os
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 from PIL import Image
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import lab6_manual_algorithms as algos
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DEFAULT_SAMPLE_PATH = os.path.join(BASE_DIR, "samples", "sample_test.bmp")
+DEFAULT_OUTPUT_DIR = os.path.join(BASE_DIR, "output")
+
+
+def resolve_existing_path(path):
+    """
+    Знаходить дійсний шлях до файлу: якщо відносний шлях не знайдено в CWD,
+    шукає його відносно каталогу модуля (BASE_DIR).
+    """
+    if not path:
+        return DEFAULT_SAMPLE_PATH
+    if os.path.isabs(path) and os.path.exists(path):
+        return path
+    if os.path.exists(path):
+        return os.path.abspath(path)
+    cand = os.path.join(BASE_DIR, path)
+    if os.path.exists(cand):
+        return cand
+    return os.path.abspath(path)
+
+
+def resolve_output_dir(dir_path):
+    """
+    Знаходить дійсний каталог для вихідних файлів.
+    """
+    if not dir_path:
+        return DEFAULT_OUTPUT_DIR
+    if os.path.isabs(dir_path):
+        return dir_path
+    if os.path.isdir(dir_path):
+        return os.path.abspath(dir_path)
+    return os.path.join(BASE_DIR, dir_path)
 
 
 AVAILABLE_FILTERS = [
@@ -32,10 +68,11 @@ def load_image(file_path):
     """
     Завантажує зображення з диска та повертає список кортежів пікселів (R, G, B).
     """
-    if not os.path.exists(file_path):
+    resolved_path = resolve_existing_path(file_path)
+    if not os.path.exists(resolved_path):
         raise FileNotFoundError(f"Файл не знайдено: {file_path}")
 
-    with Image.open(file_path) as img:
+    with Image.open(resolved_path) as img:
         img_rgb = img.convert('RGB')
         w, h = img_rgb.size
         pixels = list(img_rgb.getdata())
@@ -54,7 +91,7 @@ def save_image(output_path, width, height, pixels, img_format="BMP"):
     return output_path
 
 
-def prepare_9_test_images(source_path="samples/sample_test.bmp", output_dir="output"):
+def prepare_9_test_images(source_path=None, output_dir=None):
     """
     Формує набір з 9 цифрових зображень розміром 128х128 у форматі BMP:
     0: f0 - без шуму
@@ -67,6 +104,8 @@ def prepare_9_test_images(source_path="samples/sample_test.bmp", output_dir="out
     7: f7 - просторово-нестаціонарний адитивний шум як лінійна функція координат (sigma in [5, 35])
     8: f8 - просторово-нестаціонарний адитивний шум як радіальна функція координат (sigma in [5, 40])
     """
+    source_path = resolve_existing_path(source_path)
+    output_dir = resolve_output_dir(output_dir)
     os.makedirs(output_dir, exist_ok=True)
     pixels, w, h, _ = load_image(source_path)
 
@@ -113,11 +152,12 @@ def prepare_9_test_images(source_path="samples/sample_test.bmp", output_dir="out
     return saved_paths, collage_path
 
 
-def evaluate_f0_distortion(output_dir="output"):
+def evaluate_f0_distortion(output_dir=None):
     """
     Застосовує обрані фільтри до неспотвореного зображення f0 та оцінює
     величину спотворення epsilon_A0^2 та PSNR.
     """
+    output_dir = resolve_output_dir(output_dir)
     f0_path = os.path.join(output_dir, "image0.bmp")
     if not os.path.exists(f0_path):
         raise FileNotFoundError(f"Файл {f0_path} не знайдено. Спочатку згенеруйте набір зображень.")
@@ -165,12 +205,13 @@ def evaluate_f0_distortion(output_dir="output"):
     return results, collage_path
 
 
-def evaluate_all_noisy_images(output_dir="output"):
+def evaluate_all_noisy_images(output_dir=None):
     """
     Застосовує всі фільтри до всіх зашумлених зображень f1..f8,
     обчислює метрики epsilon_Ak^2, MSE відносно f0, PSNR,
     та визначає оптимальний фільтр для кожного типу шуму.
     """
+    output_dir = resolve_output_dir(output_dir)
     f0_path = os.path.join(output_dir, "image0.bmp")
     if not os.path.exists(f0_path):
         raise FileNotFoundError(f"Файл {f0_path} не знайдено.")

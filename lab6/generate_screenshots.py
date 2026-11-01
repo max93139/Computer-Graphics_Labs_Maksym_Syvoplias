@@ -49,7 +49,9 @@ def create_terminal_screenshot(output_path, title, lines, width=1980, min_height
 
 
 def generate_all_screenshots():
-    out_dir = "/Users/mac/Desktop/Python/Computer Graphics/lab1/lab6/screenshots"
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    out_dir = os.path.join(base_dir, "screenshots")
+    mirror_dir = "/Users/mac/Desktop/Python/Computer Graphics/lab6/screenshots"
 
     lines_img1 = [
         ("mac@MacBook-Pro:~/Desktop/Python/Computer Graphics/lab6$ python3 main.py", (100, 255, 100)),
@@ -158,6 +160,15 @@ def generate_all_screenshots():
         ("mac@MacBook-Pro:~/Desktop/Python/Computer Graphics/lab6$ ", (100, 255, 100)),
     ]
     create_terminal_screenshot(os.path.join(out_dir, "lab6_image4.png"), "mac — zsh — 1980x1080", lines_img4, min_height=900)
+
+    if os.path.exists(os.path.dirname(mirror_dir)):
+        os.makedirs(mirror_dir, exist_ok=True)
+        import shutil
+        for img_name in ["lab6_image1.png", "lab6_image2.png", "lab6_image3.png", "lab6_image4.png"]:
+            src = os.path.join(out_dir, img_name)
+            dst = os.path.join(mirror_dir, img_name)
+            if os.path.exists(src):
+                shutil.copy2(src, dst)
 
 
 if __name__ == '__main__':

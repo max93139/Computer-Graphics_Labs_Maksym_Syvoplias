@@ -42,6 +42,8 @@ def add_gaussian_noise(pixels, width, height, mean=0.0, sigma=15.0, seed=None):
     """
     Додає адитивний шум з нормальним (гауссівським) розподілом N(mean, sigma^2).
     """
+    if not pixels:
+        return []
     rng = random.Random(seed)
     noisy_pixels = []
     for p in pixels:
@@ -61,6 +63,8 @@ def add_impulse_noise(pixels, width, height, prob=0.05, seed=None):
     Додає імпульсний шум типу 'сіль і перець' з ймовірністю prob.
     Ймовірність prob/2 - білий піксель (сіль, 255), prob/2 - чорний (перець, 0).
     """
+    if not pixels:
+        return []
     rng = random.Random(seed)
     noisy_pixels = []
     half_prob = prob / 2.0
@@ -88,6 +92,8 @@ def add_brightness_dependent_noise(pixels, width, height, alpha=1.5, seed=None):
     Додає просторово-нестаціонарний адитивний шум, дисперсія якого
     залежить від рівня яскравості пікселя: sigma^2(Y) = alpha * Y.
     """
+    if not pixels:
+        return []
     rng = random.Random(seed)
     noisy_pixels = []
     for p in pixels:
@@ -109,6 +115,8 @@ def add_spatial_coordinate_noise(pixels, width, height, sigma_min=5.0, sigma_max
     Додає просторово-нестаціонарний адитивний шум, дисперсія якого є функцією
     просторових координат (x, y): лінійний градієнт або радіальна залежність.
     """
+    if not pixels:
+        return []
     rng = random.Random(seed)
     noisy_pixels = []
     max_dist = math.sqrt((width - 1) ** 2 + (height - 1) ** 2) if mode == 'radial' else float((width - 1) + (height - 1))
@@ -181,6 +189,8 @@ def apply_linear_filter(pixels, width, height, kernel):
     Застосовує довільний лінійний фільтр (2D-згортку) з ядром довільного непарного розміру.
     Використовує крайову обробку методом реплікації граничних пікселів (clamp).
     """
+    if not pixels:
+        return []
     k_height = len(kernel)
     k_width = len(kernel[0])
     rad_y = k_height // 2
@@ -225,6 +235,8 @@ def apply_median_filter(pixels, width, height, radius=1):
     Застосовує медіанний нелінійний фільтр з вікном (2*radius + 1) x (2*radius + 1).
     Для radius=1 розмір вікна 3x3, для radius=2 розмір вікна 5x5, для radius=3 - 7x7.
     """
+    if not pixels:
+        return []
     size = 2 * radius + 1
     total_elements = size * size
     med_index = total_elements // 2
@@ -268,6 +280,8 @@ def apply_min_filter(pixels, width, height, radius=1):
     """
     Застосовує нелінійний мінімальний фільтр (морфологічна ерозія відтінків) у вікні.
     """
+    if not pixels:
+        return []
     has_alpha = (len(pixels[0]) == 4)
     result_pixels = []
 
@@ -303,6 +317,8 @@ def apply_max_filter(pixels, width, height, radius=1):
     """
     Застосовує нелінійний максимальний фільтр (морфологічна дилатація відтінків) у вікні.
     """
+    if not pixels:
+        return []
     has_alpha = (len(pixels[0]) == 4)
     result_pixels = []
 
@@ -340,6 +356,8 @@ def apply_midpoint_filter(pixels, width, height, radius=1):
     Нове значення = (min + max) / 2.
     Ефективний для шуму з рівномірним або гауссівським розподілом на малих вибірках.
     """
+    if not pixels:
+        return []
     has_alpha = (len(pixels[0]) == 4)
     result_pixels = []
 
@@ -387,6 +405,8 @@ def apply_alpha_trimmed_mean_filter(pixels, width, height, radius=1, d=4):
     У вікні 3х3 (9 елементів) відкидає d/2 найменших і d/2 найбільших значень,
     а потім обчислює середнє арифметичне решти (9 - d) елементів.
     """
+    if not pixels:
+        return []
     size = 2 * radius + 1
     total = size * size
     low_trim = d // 2
@@ -439,6 +459,8 @@ def apply_adaptive_median_filter(pixels, width, height, max_radius=2):
     Динамічно змінює розмір вікна від 3x3 (radius=1) до max_radius (наприклад, 5x5 чи 7x7),
     зберігаючи текстури та усуваючи високу щільність імпульсного шуму.
     """
+    if not pixels:
+        return []
     has_alpha = (len(pixels[0]) == 4)
     result_pixels = []
 
@@ -498,6 +520,9 @@ def calculate_mse(pixels_a, pixels_b):
     Обчислює середньоквадратичну похибку (MSE) між двома наборами пікселів.
     Формула: MSE = (1 / (N * M * 3)) * sum(|a - b|^2)
     """
+    if not pixels_a or not pixels_b:
+        return 0.0
+
     if len(pixels_a) != len(pixels_b):
         raise ValueError("Розміри масивів пікселів для порівняння не збігаються.")
 

@@ -22,12 +22,14 @@ def show_menu():
 
 def handle_prepare_images():
     print("\nДія 1: Підготовка набору 9 тестових зображень (128x128 BMP)")
-    path = input("Шлях до вихідного зображення [samples/sample_test.bmp]: ").strip() or "samples/sample_test.bmp"
+    raw_path = input("Шлях до вихідного зображення [samples/sample_test.bmp]: ").strip() or ops.DEFAULT_SAMPLE_PATH
+    path = ops.resolve_existing_path(raw_path)
     if not os.path.exists(path):
         print(f"[Помилка] Файл '{path}' не знайдено.")
         return
 
-    out_dir = input("Каталог збереження [output]: ").strip() or "output"
+    raw_out = input("Каталог збереження [output]: ").strip() or ops.DEFAULT_OUTPUT_DIR
+    out_dir = ops.resolve_output_dir(raw_out)
     print("\n[Генерація 9 тестових зображень у форматі BMP (128x128)...]")
     saved_paths, collage_path = ops.prepare_9_test_images(source_path=path, output_dir=out_dir)
 
@@ -39,7 +41,8 @@ def handle_prepare_images():
 
 def handle_f0_distortion():
     print("\nДія 2: Оцінка спотворення неспотвореного зображення f0(i,j)")
-    out_dir = input("Каталог з тестовими зображеннями [output]: ").strip() or "output"
+    raw_out = input("Каталог з тестовими зображеннями [output]: ").strip() or ops.DEFAULT_OUTPUT_DIR
+    out_dir = ops.resolve_output_dir(raw_out)
     f0_file = os.path.join(out_dir, "image0.bmp")
     if not os.path.exists(f0_file):
         print(f"[Помилка] Файл '{f0_file}' не знайдено. Спочатку виконайте Дію 1.")
@@ -57,7 +60,8 @@ def handle_f0_distortion():
 
 def handle_noisy_filtering():
     print("\nДія 3: Фільтрація зашумлених зображень (f1-f8) та оцінка якості")
-    out_dir = input("Каталог з тестовими зображеннями [output]: ").strip() or "output"
+    raw_out = input("Каталог з тестовими зображеннями [output]: ").strip() or ops.DEFAULT_OUTPUT_DIR
+    out_dir = ops.resolve_output_dir(raw_out)
     f0_file = os.path.join(out_dir, "image0.bmp")
     if not os.path.exists(f0_file):
         print(f"[Помилка] Файл '{f0_file}' не знайдено. Спочатку виконайте Дію 1.")
@@ -86,7 +90,7 @@ def handle_full_pipeline():
     ops.evaluate_f0_distortion()
     print("3) Пакетна фільтрація зашумлених зображень та побудова графіків")
     ops.evaluate_all_noisy_images()
-    print("\n[Успіх] Комплексний аналіз повністю завершено. Усі файли оновлено в каталозі output/")
+    print(f"\n[Успіх] Комплексний аналіз повністю завершено. Усі файли оновлено в каталозі '{ops.DEFAULT_OUTPUT_DIR}'")
 
 
 def main():
